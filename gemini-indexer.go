@@ -143,7 +143,7 @@ nextGeminiFile:
 	}
 
 	if optOutputFile != "" {
-		of, err := os.OpenFile(optOutputFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		of, err := os.OpenFile(optOutputFile, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			log.Fatal("main: failed to open output file to write:", err)
 		}
