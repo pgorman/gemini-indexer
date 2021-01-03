@@ -1,0 +1,9 @@
+# {{.Title}}
+
+Hello.
+{{if .GeminiLinks}}{{range $l := .GeminiLinks}}
+=> {{$l.File}} {{$l.Date}} {{$l.Label}}{{end}}
+{{end}}{{if .OtherFiles}}{{range $f := .OtherFiles}}
+=> {{$f}}{{end}}{{end}}
+
+Goodbye.
