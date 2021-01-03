@@ -44,6 +44,7 @@ func extractLabel(file string) string {
 
 func main() {
 	var err error
+	var ignoreFiles []string
 	var optDotFiles bool
 	var optIgnore string
 	var optInputDir string
@@ -81,6 +82,10 @@ func main() {
 		log.Fatal("main: failed to parse template:", err)
 	}
 
+	if optIgnore != "" {
+		ignoreFiles = strings.Split(optIgnore, ",")
+	}
+
 	reDate = regexp.MustCompile(`(?:[-_])?(\d{4}-\d{2}-\d{2})(?:[-_])?`)
 	var td templateData
 	td.Title = optTitle
@@ -91,19 +96,31 @@ func main() {
 	if err != nil {
 		log.Fatalf("main: failed to open input directory '%s': %v", optInputDir, err)
 	}
+nextNonGeminiFile:
 	for _, f := range files { // Non-Gemini files, sorted alphabetically (well, by increasing value)
 		if !optDotFiles && f.Name()[0] == "."[0] {
 			continue
+		}
+		for _, ig := range ignoreFiles {
+			if f.Name() == ig {
+				continue nextNonGeminiFile
+			}
 		}
 		s := strings.Split(f.Name(), ".")
 		if (len(s) == 1) || (len(s) > 1 && (s[len(s)-1] != "gmi" && s[len(s)-1] != "gemini")) {
 			td.OtherFiles = append(td.OtherFiles, f.Name())
 		}
 	}
+nextGeminiFile:
 	for i := len(files) - 1; i >= 0; i-- { // Gemini files, sorted newest to oldest
 		f := files[i]
 		if !optDotFiles && f.Name()[0] == "."[0] {
 			continue
+		}
+		for _, ig := range ignoreFiles {
+			if f.Name() == ig {
+				continue nextGeminiFile
+			}
 		}
 		s := strings.Split(f.Name(), ".")
 		if len(s) > 1 && (s[len(s)-1] == "gmi" || s[len(s)-1] == "gemini") {
